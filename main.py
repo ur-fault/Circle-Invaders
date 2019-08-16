@@ -30,6 +30,7 @@ class Game:
         self.explosions = pg.sprite.Group()
         self.main = pg.sprite.Group()
         self.texts = pg.sprite.Group()
+        self.bgobjects = pg.sprite.Group()
 
         self.increase = 0
         self.step = 1
@@ -62,15 +63,24 @@ class Game:
             pg.image.load(
                 path.join(
                     img_folder, BULLET_IMG)), 270, 1 / 20)
+        self.star_img = pg.transform.rotozoom(
+            pg.image.load(
+                path.join(
+                    img_folder, STAR_IMG)), 0, 1 / 2)
         self.invader_imgs = [pg.transform.rotozoom(
             pg.image.load(
                 path.join(
                     img_folder, img)), 0, 1 / 20) for img in INVADER_IMGS]
-        self.explosion_imgs = [pg.transform.rotozoom(
-            pg.image.load(
-                path.join(
-                    explosion_folder, img)),
-            0, 1) for img in EXPLOSION_IMGS]
+        self.explosion_imgs = []
+        for img_path in EXPLOSION_IMGS:
+            sur = pg.image.load(path.join(explosion_folder, img_path))
+            sur.set_colorkey(BLACK)
+            self.explosion_imgs.append(sur)
+        # self.explosion_imgs = [pg.transform.rotozoom(
+        #     pg.image.load(
+        #         path.join(
+        #             explosion_folder, img)),
+        #     0, 1) for img in EXPLOSION_IMGS]
         self.font = pg.font.SysFont(
             'consolas', 20, bold=50, italic=0, constructor=None)
         self.title_font = pg.font.SysFont(
@@ -87,6 +97,7 @@ class Game:
 
     def update(self):
         # Game Loop - Update
+        self.chance_for_star()
         self.chance_for_enemy()
         self.all_sprites.update()
         hits = pg.sprite.groupcollide(
@@ -108,6 +119,10 @@ class Game:
                 print('DONE')
                 # self.playing = False
 
+        for object in self.bgobjects:
+            if not SCREEN_WITH_OFFSET.colliderect(object.rect):
+                object.kill()
+
     def events(self):
         # Game Loop - events
         for event in pg.event.get():
@@ -121,6 +136,7 @@ class Game:
         # Game Loop - draw
         self.screen.fill(BGCOLOR)
         # self.all_sprites.draw(self.screen)
+        self.bgobjects.draw(self.screen)
         self.bullets.draw(self.screen)
         self.invaders.draw(self.screen)
         self.main.draw(self.screen)
@@ -165,6 +181,18 @@ class Game:
             rot = randint(0, 360)
             rot_speed = randint(INVADER_MIN_ROT_SPEED, INVADER_MAX_ROT_SPEED)
             Invader(self, pos, vel, rot, rot_speed, img)
+
+    def chance_for_star(self):
+        chance = round(randint(
+            0, int(1 / (INVADER_CHANCE + self.increase)) * 10) / 10, 0)
+        if chance == 0:
+            facing = randint(0, 360)
+            pos = vec(INVADER_OFFSET, 0).rotate(facing) + CENTER
+            vel = vec(randint(INVADER_MIN_SPEED, INVADER_MAX_SPEED),
+                      0).rotate(facing - 180)
+            rot = randint(0, 360)
+            rot_speed = randint(INVADER_MIN_ROT_SPEED, INVADER_MAX_ROT_SPEED)
+            Star(self, pos, vel, rot, rot_speed)
 
 
 g = Game()

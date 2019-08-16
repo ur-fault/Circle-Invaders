@@ -5,6 +5,10 @@ vec = pg.math.Vector2
 # game options/settings
 WIDTH = 512
 HEIGHT = 512
+SCREEN_OFFSET = 250
+SCREEN_WITH_OFFSET = pg.Rect(-SCREEN_OFFSET, -SCREEN_OFFSET,
+                             WIDTH + 2 * SCREEN_OFFSET,
+                             HEIGHT + 2 * SCREEN_OFFSET)
 FPS = 60
 CENTER = vec(WIDTH / 2, HEIGHT / 2)
 
@@ -68,3 +72,12 @@ KILL_SCORE = 1100
 # Explosion effect's settings
 ONE_TICK = 16
 EXPLOSION_IMGS = ['explosion{}.png'.format(img) for img in range(1, 64, 1)]
+
+# BackGround objects (star)
+STAR_CHANCE = 1
+STAR_OFFSET = vec(400, 0)
+STAR_MIN_ROT_SPEED = 10
+STAR_MAX_ROT_SPEED = 180
+STAR_MIN_SPEED = 5
+STAR_MAX_SPEED = 40
+STAR_IMG = 'star001.png'

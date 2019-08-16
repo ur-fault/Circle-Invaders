@@ -81,6 +81,8 @@ class Text(pg.sprite.Sprite):
             self.value = parent.game.increase + INVADER_CHANCE
         elif option == 5:
             self.value = len(parent.game.invaders)
+        elif option == 6:
+            self.value = len(parent.game.bgobjects)
 
         self.image = parent.game.font.render(
             '{} => {}'.format(text, parent.speed), False, color)
@@ -104,6 +106,8 @@ class Text(pg.sprite.Sprite):
             self.value = self.parent.game.increase + INVADER_CHANCE
         elif self.option == 5:
             self.value = len(self.parent.game.invaders)
+        elif self.option == 6:
+            self.value = len(self.parent.game.bgobjects)
         self.image = self.parent.game.font.render('{} => {}'.format(
             self.text, round(self.value, 3)), False, self.color)
 
@@ -157,6 +161,34 @@ class Invader(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = self.pos
         self.radius = self.rect.width / 2
+
+    def update(self):
+        self.pos = self.pos + (self.vel * self.game.dt)
+        self.rot += self.rot_speed * self.game.dt
+        if self.rot > 360:
+            self.rot -= 360
+        elif self.rot < 0:
+            self.rot += 360
+        self.image = pg.transform.rotate(self.main_img, self.rot)
+        self.rect = self.image.get_rect()
+        self.rect.center = self.pos
+
+
+class Star(pg.sprite.Sprite):
+    def __init__(self, game, pos, vel, rot, rot_speed):
+        self.groups = game.all_sprites, game.bgobjects
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+
+        self.pos = pos
+        self.vel = vel
+        self.rot = rot
+        self.rot_speed = rot_speed
+
+        self.main_img = game.star_img
+        self.image = pg.transform.rotate(self.main_img, self.rot)
+        self.rect = self.image.get_rect()
+        self.rect.center = self.pos
 
     def update(self):
         self.pos = self.pos + (self.vel * self.game.dt)
