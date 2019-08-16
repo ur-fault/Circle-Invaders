@@ -64,3 +64,7 @@ SCORE_STEP = 10000
 SCORE_INVADER_INCREASE = 0.005
 SCORE_BULLET_DECREASE = 100
 KILL_SCORE = 1100
+
+# Explosion effect's settings
+ONE_TICK = 16
+EXPLOSION_IMGS = ['explosion{}.png'.format(img) for img in range(1, 64, 1)]

@@ -27,6 +27,9 @@ class Game:
         self.all_sprites = pg.sprite.Group()
         self.bullets = pg.sprite.Group()
         self.invaders = pg.sprite.Group()
+        self.explosions = pg.sprite.Group()
+        self.main = pg.sprite.Group()
+        self.texts = pg.sprite.Group()
 
         self.increase = 0
         self.step = 1
@@ -36,11 +39,9 @@ class Game:
 
         self.score_text = Text(vec(30, HEIGHT - 30),
                                YELLOW, self.player, 'Score', 3)
-        self.all_sprites.add(self.score_text)
 
-        self.invader_chance_text = Text(
-            vec(30, 30), RED, self.player, 'Chance', 4)
-        self.all_sprites.add(self.invader_chance_text)
+        self.invaders_text = Text(
+            vec(30, 30), RED, self.player, 'Invaders', 5)
 
         self.run()
 
@@ -48,6 +49,7 @@ class Game:
         # Load game data
         game_folder = path.dirname(__file__)
         img_folder = path.join(game_folder, 'img')
+        explosion_folder = path.join(img_folder, 'explosions')
         self.player_img = pg.transform.rotozoom(
             pg.image.load(
                 path.join(
@@ -64,6 +66,11 @@ class Game:
             pg.image.load(
                 path.join(
                     img_folder, img)), 0, 1 / 20) for img in INVADER_IMGS]
+        self.explosion_imgs = [pg.transform.rotozoom(
+            pg.image.load(
+                path.join(
+                    explosion_folder, img)),
+            0, 1) for img in EXPLOSION_IMGS]
         self.font = pg.font.SysFont(
             'consolas', 20, bold=50, italic=0, constructor=None)
         self.title_font = pg.font.SysFont(
@@ -86,7 +93,9 @@ class Game:
             self.invaders, self.bullets, False, False)
         for hit in hits:
             if isinstance(hit, Invader):
+                pos = vec(hit.pos)
                 hit.kill()
+                Explosion(self, pos)
                 self.player.score += KILL_SCORE
 
         if self.player.score > SCORE_STEP * self.step and \
@@ -97,7 +106,7 @@ class Game:
         for invader in self.invaders:
             if pg.sprite.collide_circle(self.earth, invader):
                 print('DONE')
-                self.playing = False
+                # self.playing = False
 
     def events(self):
         # Game Loop - events
@@ -111,7 +120,12 @@ class Game:
     def draw(self):
         # Game Loop - draw
         self.screen.fill(BGCOLOR)
-        self.all_sprites.draw(self.screen)
+        # self.all_sprites.draw(self.screen)
+        self.bullets.draw(self.screen)
+        self.invaders.draw(self.screen)
+        self.main.draw(self.screen)
+        self.explosions.draw(self.screen)
+        self.texts.draw(self.screen)
         pg.display.set_caption('{} => {}'.format(
             TITLE, round(self.clock.get_fps(), 2)))
         # *after* drawing everything, flip the display

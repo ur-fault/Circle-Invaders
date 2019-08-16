@@ -7,7 +7,7 @@ vec = pg.math.Vector2
 
 class Player(pg.sprite.Sprite):
     def __init__(self, game):
-        self.groups = game.all_sprites
+        self.groups = game.all_sprites, game.main
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = game.player_img
@@ -66,7 +66,8 @@ class Player(pg.sprite.Sprite):
 
 class Text(pg.sprite.Sprite):
     def __init__(self, pos, color, parent, text, option):
-        pg.sprite.Sprite.__init__(self)
+        self.groups = parent.game.all_sprites, parent.game.texts
+        pg.sprite.Sprite.__init__(self, self.groups)
         self.value = 0
         if option == 0:
             self.value = parent.speed
@@ -78,6 +79,8 @@ class Text(pg.sprite.Sprite):
             self.value = parent.score
         elif option == 4:
             self.value = parent.game.increase + INVADER_CHANCE
+        elif option == 5:
+            self.value = len(parent.game.invaders)
 
         self.image = parent.game.font.render(
             '{} => {}'.format(text, parent.speed), False, color)
@@ -99,13 +102,15 @@ class Text(pg.sprite.Sprite):
             self.value = self.parent.score
         elif self.option == 4:
             self.value = self.parent.game.increase + INVADER_CHANCE
+        elif self.option == 5:
+            self.value = len(self.parent.game.invaders)
         self.image = self.parent.game.font.render('{} => {}'.format(
             self.text, round(self.value, 3)), False, self.color)
 
 
 class Earth(pg.sprite.Sprite):
     def __init__(self, game):
-        self.groups = game.all_sprites
+        self.groups = game.all_sprites, game.main
         pg.sprite.Sprite.__init__(self, self.groups)
         self.image = game.earth_img
 
@@ -163,3 +168,22 @@ class Invader(pg.sprite.Sprite):
         self.image = pg.transform.rotate(self.main_img, self.rot)
         self.rect = self.image.get_rect()
         self.rect.center = self.pos
+
+
+class Explosion(pg.sprite.Sprite):
+    def __init__(self, game, pos):
+        self.groups = game.all_sprites, game.explosions
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.image = game.explosion_imgs[1]
+        self.rect = self.image.get_rect()
+        self.game = game
+
+        self.pos = pos
+        self.rect.center = pos
+        self.spawn_time = pg.time.get_ticks()
+
+    def update(self):
+        lifetime = pg.time.get_ticks() - self.spawn_time
+        if lifetime > len(EXPLOSION_IMGS) * 15:
+            self.kill()
+        self.image = self.game.explosion_imgs[int(lifetime / 16) - 1]
