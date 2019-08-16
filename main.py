@@ -117,7 +117,7 @@ class Game:
         for invader in self.invaders:
             if pg.sprite.collide_circle(self.earth, invader):
                 print('DONE')
-                # self.playing = False
+                self.playing = False
 
         for object in self.bgobjects:
             if not SCREEN_WITH_OFFSET.colliderect(object.rect):
