@@ -28,10 +28,20 @@ class Game:
         self.bullets = pg.sprite.Group()
         self.invaders = pg.sprite.Group()
 
-        self.player = Player(self)
-        self.earth = Earth(self)
         self.increase = 0
         self.step = 1
+        self.step_checked = 0
+        self.player = Player(self)
+        self.earth = Earth(self)
+
+        self.score_text = Text(vec(30, HEIGHT - 30),
+                               YELLOW, self.player, 'Score', 3)
+        self.all_sprites.add(self.score_text)
+
+        self.invader_chance_text = Text(
+            vec(30, 30), RED, self.player, 'Chance', 4)
+        self.all_sprites.add(self.invader_chance_text)
+
         self.run()
 
     def load_data(self):
@@ -56,6 +66,8 @@ class Game:
                     img_folder, img)), 0, 1 / 20) for img in INVADER_IMGS]
         self.font = pg.font.SysFont(
             'consolas', 20, bold=50, italic=0, constructor=None)
+        self.title_font = pg.font.SysFont(
+            'consolas', 50, bold=50, italic=0, constructor=None)
 
     def run(self):
         # Game Loop
@@ -70,14 +82,22 @@ class Game:
         # Game Loop - Update
         self.chance_for_enemy()
         self.all_sprites.update()
-        hits = pg.sprite.groupcollide(self.invaders, self.bullets, False, True)
+        hits = pg.sprite.groupcollide(
+            self.invaders, self.bullets, False, False)
         for hit in hits:
-            hit.kill()
-            self.player.score += 10
+            if isinstance(hit, Invader):
+                hit.kill()
+                self.player.score += KILL_SCORE
 
-        if self.player.score > SCORE_STEP * self.step:
+        if self.player.score > SCORE_STEP * self.step and \
+                self.step_checked < self.step:
             self.step += 1
             self.increase += SCORE_INVADER_INCREASE
+
+        for invader in self.invaders:
+            if pg.sprite.collide_circle(self.earth, invader):
+                print('DONE')
+                self.playing = False
 
     def events(self):
         # Game Loop - events
@@ -90,7 +110,7 @@ class Game:
 
     def draw(self):
         # Game Loop - draw
-        self.screen.fill(BLACK)
+        self.screen.fill(BGCOLOR)
         self.all_sprites.draw(self.screen)
         pg.display.set_caption('{} => {}'.format(
             TITLE, round(self.clock.get_fps(), 2)))
@@ -99,7 +119,21 @@ class Game:
 
     def show_start_screen(self):
         # game splash/start screen
-        pass
+        self.screen.fill(BGCOLOR)
+        title = self.title_font.render(TITLE, False, TITLE_COLOR)
+        title_rect = title.get_rect()
+        title_rect.center = TITLE_POS
+        answered = False
+        while not answered:
+            self.events()
+            keys = pg.key.get_pressed()
+            for key in keys:
+                if key:
+                    answered = True
+
+            self.screen.fill(BGCOLOR)
+            self.screen.blit(title, title_rect)
+            pg.display.flip()
 
     def show_go_screen(self):
         # game over/continue

@@ -1,12 +1,13 @@
 import pygame as pg
 vec = pg.math.Vector2
 
+
 # game options/settings
-TITLE = "Circle Invaders!"
 WIDTH = 512
 HEIGHT = 512
 FPS = 60
 CENTER = vec(WIDTH / 2, HEIGHT / 2)
+
 
 # define colors
 WHITE = (255, 255, 255)
@@ -15,6 +16,17 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
+LIGHT_BLUE = (21, 133, 189)
+DARK_GREY = (32, 32, 32)
+LIGHT_GREY = (128, 128, 128)
+
+BGCOLOR = BLACK
+
+# Title's settings
+TITLE = "Circle Invaders!"
+TITLE_POS = vec(WIDTH / 2, 75)
+TITLE_COLOR = LIGHT_GREY
+TITLE_BCCOLOR = DARK_GREY
 
 # Player's settings
 PLAYER_SPEED = 30
@@ -30,7 +42,7 @@ INVADER_OFFSET = vec(400, 0)
 INVADER_MIN_ROT_SPEED = 30
 INVADER_MAX_ROT_SPEED = 360
 INVADER_MIN_SPEED = 10
-INVADER_MAX_SPEED = 60
+INVADER_MAX_SPEED = 50
 INVADER_IMGS = [
     'meteor001.png',
     'meteor002.png',
@@ -47,5 +59,8 @@ BULLET_IMG = 'bullet001.png'
 # Earth's settings
 EARTH_IMG = 'earth001.png'
 
-SCORE_STEP = 100
-SCORE_INVADER_INCREASE = 0.05
+# Score's settings
+SCORE_STEP = 10000
+SCORE_INVADER_INCREASE = 0.005
+SCORE_BULLET_DECREASE = 100
+KILL_SCORE = 1100

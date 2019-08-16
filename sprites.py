@@ -20,8 +20,6 @@ class Player(pg.sprite.Sprite):
         self.last_shot = 0
 
         self.score = 0
-        self.score_text = Text(vec(30, HEIGHT - 30), YELLOW, self, 'Score', 3)
-        self.game.all_sprites.add(self.score_text)
 
         self.rect = self.image.get_rect()
         self.rect.center = self.pos
@@ -40,6 +38,7 @@ class Player(pg.sprite.Sprite):
                 self.last_shot = now
                 Bullet(self.game, self.pos + BARREL_OFFSET.rotate(self.rot),
                        self.rot)
+                self.score -= SCORE_BULLET_DECREASE
 
     def update(self):
         self.get_keys()
@@ -77,6 +76,8 @@ class Text(pg.sprite.Sprite):
             self.value = parent.rot
         elif option == 3:
             self.value = parent.score
+        elif option == 4:
+            self.value = parent.game.increase + INVADER_CHANCE
 
         self.image = parent.game.font.render(
             '{} => {}'.format(text, parent.speed), False, color)
@@ -96,8 +97,10 @@ class Text(pg.sprite.Sprite):
             self.value = self.parent.rot
         elif self.option == 3:
             self.value = self.parent.score
+        elif self.option == 4:
+            self.value = self.parent.game.increase + INVADER_CHANCE
         self.image = self.parent.game.font.render('{} => {}'.format(
-            self.text, round(self.value, 2)), False, self.color)
+            self.text, round(self.value, 3)), False, self.color)
 
 
 class Earth(pg.sprite.Sprite):
@@ -105,8 +108,10 @@ class Earth(pg.sprite.Sprite):
         self.groups = game.all_sprites
         pg.sprite.Sprite.__init__(self, self.groups)
         self.image = game.earth_img
+
         self.rect = self.image.get_rect()
         self.rect.center = (WIDTH / 2, HEIGHT / 2)
+        self.radius = self.rect.width / 2
 
 
 class Bullet(pg.sprite.Sprite):
@@ -146,6 +151,7 @@ class Invader(pg.sprite.Sprite):
         self.image = pg.transform.rotate(self.main_img, self.rot)
         self.rect = self.image.get_rect()
         self.rect.center = self.pos
+        self.radius = self.rect.width / 2
 
     def update(self):
         self.pos = self.pos + (self.vel * self.game.dt)
