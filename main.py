@@ -30,6 +30,8 @@ class Game:
 
         self.player = Player(self)
         self.earth = Earth(self)
+        self.increase = 0
+        self.step = 1
         self.run()
 
     def load_data(self):
@@ -68,6 +70,14 @@ class Game:
         # Game Loop - Update
         self.chance_for_enemy()
         self.all_sprites.update()
+        hits = pg.sprite.groupcollide(self.invaders, self.bullets, False, True)
+        for hit in hits:
+            hit.kill()
+            self.player.score += 10
+
+        if self.player.score > SCORE_STEP * self.step:
+            self.step += 1
+            self.increase += SCORE_INVADER_INCREASE
 
     def events(self):
         # Game Loop - events
@@ -96,9 +106,9 @@ class Game:
         pass
 
     def chance_for_enemy(self):
-        chance = round(randint(0, int(1 / INVADER_CHANCE) * 10) / 10, 0)
+        chance = round(randint(
+            0, int(1 / (INVADER_CHANCE + self.increase)) * 10) / 10, 0)
         if chance == 0:
-            print('Hey, attention INVADER')
             img = choice(self.invader_imgs)
             facing = randint(0, 360)
             pos = vec(INVADER_OFFSET, 0).rotate(facing) + CENTER

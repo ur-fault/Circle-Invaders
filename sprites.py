@@ -11,21 +11,20 @@ class Player(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = game.player_img
+
         self.rot = 270
         self.speed = 0
         self.vel = 0
         self.pos = vec(CENTER_OFFSET, 0).rotate(self.rot) + CENTER
+
         self.last_shot = 0
+
+        self.score = 0
+        self.score_text = Text(vec(30, HEIGHT - 30), YELLOW, self, 'Score', 3)
+        self.game.all_sprites.add(self.score_text)
 
         self.rect = self.image.get_rect()
         self.rect.center = self.pos
-
-        # self.speed_text = Text((30, 30), YELLOW, self, 'Speed', 0)
-        # self.vel_text = Text((30, 60), YELLOW, self, 'Vel', 1)
-        # self.rot_text = Text((30, 90), YELLOW, self, 'Rot', 2)
-        # self.game.all_sprites.add(self.speed_text)
-        # self.game.all_sprites.add(self.vel_text)
-        # self.game.all_sprites.add(self.rot_text)
 
     def get_keys(self):
         self.vel = 0
@@ -76,6 +75,8 @@ class Text(pg.sprite.Sprite):
             self.value = parent.vel
         elif option == 2:
             self.value = parent.rot
+        elif option == 3:
+            self.value = parent.score
 
         self.image = parent.game.font.render(
             '{} => {}'.format(text, parent.speed), False, color)
@@ -93,6 +94,8 @@ class Text(pg.sprite.Sprite):
             self.value = self.parent.vel
         elif self.option == 2:
             self.value = self.parent.rot
+        elif self.option == 3:
+            self.value = self.parent.score
         self.image = self.parent.game.font.render('{} => {}'.format(
             self.text, round(self.value, 2)), False, self.color)
 

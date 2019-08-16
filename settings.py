@@ -46,3 +46,6 @@ BULLET_IMG = 'bullet001.png'
 
 # Earth's settings
 EARTH_IMG = 'earth001.png'
+
+SCORE_STEP = 100
+SCORE_INVADER_INCREASE = 0.05
