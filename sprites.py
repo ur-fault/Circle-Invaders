@@ -20,12 +20,12 @@ class Player(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = self.pos
 
-        self.speed_text = Text((30, 30), YELLOW, self, 'Speed', 0)
-        self.vel_text = Text((30, 60), YELLOW, self, 'Vel', 1)
-        self.rot_text = Text((30, 90), YELLOW, self, 'Rot', 2)
-        self.game.all_sprites.add(self.speed_text)
-        self.game.all_sprites.add(self.vel_text)
-        self.game.all_sprites.add(self.rot_text)
+        # self.speed_text = Text((30, 30), YELLOW, self, 'Speed', 0)
+        # self.vel_text = Text((30, 60), YELLOW, self, 'Vel', 1)
+        # self.rot_text = Text((30, 90), YELLOW, self, 'Rot', 2)
+        # self.game.all_sprites.add(self.speed_text)
+        # self.game.all_sprites.add(self.vel_text)
+        # self.game.all_sprites.add(self.rot_text)
 
     def get_keys(self):
         self.vel = 0
@@ -64,8 +64,6 @@ class Player(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.pos = vec(CENTER_OFFSET, 0).rotate(self.rot) + CENTER
         self.rect.center = self.pos
-        # self.rect.center = (vec(CENTER_OFFSET, 0).rotate(self.rot).x + CENTER[0],
-        #                     vec(CENTER_OFFSET, 0).rotate(self.rot).y + CENTER[1])
 
 
 class Text(pg.sprite.Sprite):
@@ -127,4 +125,32 @@ class Bullet(pg.sprite.Sprite):
             self.kill()
 
         self.pos = self.pos + (self.v * self.game.dt)
+        self.rect.center = self.pos
+
+
+class Invader(pg.sprite.Sprite):
+    def __init__(self, game, pos, vel, rot, rot_speed, image):
+        self.groups = game.all_sprites, game.invaders
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+
+        self.pos = pos
+        self.vel = vel
+        self.rot = rot
+        self.rot_speed = rot_speed
+
+        self.main_img = image
+        self.image = pg.transform.rotate(self.main_img, self.rot)
+        self.rect = self.image.get_rect()
+        self.rect.center = self.pos
+
+    def update(self):
+        self.pos = self.pos + (self.vel * self.game.dt)
+        self.rot += self.rot_speed * self.game.dt
+        if self.rot > 360:
+            self.rot -= 360
+        elif self.rot < 0:
+            self.rot += 360
+        self.image = pg.transform.rotate(self.main_img, self.rot)
+        self.rect = self.image.get_rect()
         self.rect.center = self.pos

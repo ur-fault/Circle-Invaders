@@ -1,12 +1,14 @@
 # MineFuf
 # Circle Invaders!
+# Main file with class Game
 
 import pygame as pg
 import random
 from settings import *
 from sprites import *
 from os import path
-from random import randint
+from random import randint, choice
+vec = pg.math.Vector2
 
 
 class Game:
@@ -46,6 +48,10 @@ class Game:
             pg.image.load(
                 path.join(
                     img_folder, BULLET_IMG)), 270, 1 / 20)
+        self.invader_imgs = [pg.transform.rotozoom(
+            pg.image.load(
+                path.join(
+                    img_folder, img)), 0, 1 / 20) for img in INVADER_IMGS]
         self.font = pg.font.SysFont(
             'consolas', 20, bold=50, italic=0, constructor=None)
 
@@ -90,7 +96,17 @@ class Game:
         pass
 
     def chance_for_enemy(self):
-        pass
+        chance = round(randint(0, int(1 / INVADER_CHANCE) * 10) / 10, 0)
+        if chance == 0:
+            print('Hey, attention INVADER')
+            img = choice(self.invader_imgs)
+            facing = randint(0, 360)
+            pos = vec(INVADER_OFFSET, 0).rotate(facing) + CENTER
+            vel = vec(randint(INVADER_MIN_SPEED, INVADER_MAX_SPEED),
+                      0).rotate(facing - 180)
+            rot = randint(0, 360)
+            rot_speed = randint(INVADER_MIN_ROT_SPEED, INVADER_MAX_ROT_SPEED)
+            Invader(self, pos, vel, rot, rot_speed, img)
 
 
 g = Game()
