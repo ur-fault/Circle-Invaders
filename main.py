@@ -1,7 +1,5 @@
-# KidsCanCode - Game Development with Pygame video series
-# Jumpy! (a platform game) - Part 1
-# Video link: https://www.youtube.com/watch?v=uWvb3QzA48c
-# Project setup
+# MineFuf
+# Circle Invaders!
 
 import pygame as pg
 import random
@@ -24,6 +22,9 @@ class Game:
     def new(self):
         # start a new game
         self.all_sprites = pg.sprite.Group()
+        self.bullets = pg.sprite.Group()
+        self.invaders = pg.sprite.Group()
+
         self.player = Player(self)
         self.earth = Earth(self)
         self.run()
@@ -32,11 +33,20 @@ class Game:
         # Load game data
         game_folder = path.dirname(__file__)
         img_folder = path.join(game_folder, 'img')
-        self.player_img_bad = pg.image.load(path.join(img_folder, 'player_img001.png'))
-        self.player_img = pg.transform.rotozoom(self.player_img_bad, 90, 1 / 15)
-        self.earth_img_bad = pg.image.load(path.join(img_folder, 'earth001.png'))
-        self.earth_img = pg.transform.rotozoom(self.earth_img_bad, 0, 1 / 2)
-        self.font = pg.font.SysFont('consolas', 20, bold=0, italic=0, constructor=None)
+        self.player_img = pg.transform.rotozoom(
+            pg.image.load(
+                path.join(
+                    img_folder, 'player_img001.png')), 90, 1 / 15)
+        self.earth_img = pg.transform.rotozoom(
+            pg.image.load(
+                path.join(
+                    img_folder, 'earth001.png')), 0, 1 / 2)
+        self.bullet_img = pg.transform.rotozoom(
+            pg.image.load(
+                path.join(
+                    img_folder, 'bullet001.png')), 270, 1 / 20)
+        self.font = pg.font.SysFont(
+            'consolas', 20, bold=3, italic=0, constructor=None)
 
     def run(self):
         # Game Loop
@@ -64,7 +74,8 @@ class Game:
         # Game Loop - draw
         self.screen.fill(BLACK)
         self.all_sprites.draw(self.screen)
-        pg.display.set_caption('{} => {}'.format(TITLE, int(self.clock.get_fps())))
+        pg.display.set_caption('{} => {}'.format(
+            TITLE, int(self.clock.get_fps())))
         # *after* drawing everything, flip the display
         pg.display.flip()
 

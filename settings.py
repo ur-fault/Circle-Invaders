@@ -13,7 +13,14 @@ GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
 
-# Player settings
+# Player's settings
 PLAYER_SPEED = 50
 PLAYER_SLOW_SPEED = 15
-PLAYER_MAX_SPEED = 20
+PLAYER_MAX_SPEED = 25
+
+# Invader's settings
+
+
+# Bullet's settings
+BULLET_SPEED = 300
+BULLET_LIFETIME = 1000
