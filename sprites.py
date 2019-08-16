@@ -11,26 +11,40 @@ class Player(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = game.player_img
-        self.rect = self.image.get_rect()
         self.rot = 270
         self.speed = 0
-        self.speed_text = Speed_text((30, 30), WHITE, self)
-        self.game.all_sprites.add(self.speed_text)
-        self.rect.centerx = vec(75, 0).rotate(self.rot).x + CENTER[0]
-        self.rect.centery = vec(75, 0).rotate(self.rot).y + CENTER[1]
+        self.vel = 0
+        self.pos = vec(CENTER_OFFSET, 0).rotate(self.rot) + CENTER
+        self.last_shot = 0
 
-    def update(self):
-        vel = 0
+        self.rect = self.image.get_rect()
+        self.rect.center = self.pos
+
+        self.speed_text = Text((30, 30), YELLOW, self, 'Speed', 0)
+        self.vel_text = Text((30, 60), YELLOW, self, 'Vel', 1)
+        self.rot_text = Text((30, 90), YELLOW, self, 'Rot', 2)
+        self.game.all_sprites.add(self.speed_text)
+        self.game.all_sprites.add(self.vel_text)
+        self.game.all_sprites.add(self.rot_text)
+
+    def get_keys(self):
+        self.vel = 0
         keys = pg.key.get_pressed()
         if keys[pg.K_LEFT] or keys[pg.K_a]:
-            vel -= PLAYER_SPEED * self.game.dt
+            self.vel -= PLAYER_SPEED * self.game.dt
         if keys[pg.K_RIGHT] or keys[pg.K_d]:
-            vel += PLAYER_SPEED * self.game.dt
+            self.vel += PLAYER_SPEED * self.game.dt
 
         if keys[pg.K_SPACE]:
-            Bullet(self.game, self.rect.center, self.rot)
+            now = pg.time.get_ticks()
+            if now - self.last_shot > BULLET_RATE:
+                self.last_shot = now
+                Bullet(self.game, self.pos + BARREL_OFFSET.rotate(self.rot),
+                       self.rot)
 
-        self.speed += vel
+    def update(self):
+        self.get_keys()
+        self.speed += self.vel
         if self.speed + (PLAYER_SLOW_SPEED * self.game.dt) < 0:
             self.speed += PLAYER_SLOW_SPEED * self.game.dt
         elif self.speed < 0:
@@ -48,23 +62,41 @@ class Player(pg.sprite.Sprite):
 
         self.image = pg.transform.rotate(self.game.player_img, -self.rot + 180)
         self.rect = self.image.get_rect()
-        self.rect.center = (vec(100, 0).rotate(self.rot).x + CENTER[0],
-                            vec(100, 0).rotate(self.rot).y + CENTER[1])
+        self.pos = vec(CENTER_OFFSET, 0).rotate(self.rot) + CENTER
+        self.rect.center = self.pos
+        # self.rect.center = (vec(CENTER_OFFSET, 0).rotate(self.rot).x + CENTER[0],
+        #                     vec(CENTER_OFFSET, 0).rotate(self.rot).y + CENTER[1])
 
 
-class Speed_text(pg.sprite.Sprite):
-    def __init__(self, pos, color, parent):
+class Text(pg.sprite.Sprite):
+    def __init__(self, pos, color, parent, text, option):
         pg.sprite.Sprite.__init__(self)
+        self.value = 0
+        if option == 0:
+            self.value = parent.speed
+        elif option == 1:
+            self.value = parent.vel
+        elif option == 2:
+            self.value = parent.rot
+
         self.image = parent.game.font.render(
-            'Vel => {}'.format(parent.speed), False, color)
+            '{} => {}'.format(text, parent.speed), False, color)
         self.parent = parent
         self.color = color
+        self.option = option
         self.rect = self.image.get_rect()
         self.rect.topleft = pos
+        self.text = text
 
     def update(self):
-        self.image = self.parent.game.font.render('Vel => {}'.format(
-            round(self.parent.speed, 2)), False, self.color)
+        if self.option == 0:
+            self.value = self.parent.speed
+        elif self.option == 1:
+            self.value = self.parent.vel
+        elif self.option == 2:
+            self.value = self.parent.rot
+        self.image = self.parent.game.font.render('{} => {}'.format(
+            self.text, round(self.value, 2)), False, self.color)
 
 
 class Earth(pg.sprite.Sprite):
@@ -80,17 +112,19 @@ class Bullet(pg.sprite.Sprite):
     def __init__(self, game, pos, rot):
         self.groups = game.all_sprites, game.bullets
         pg.sprite.Sprite.__init__(self, self.groups)
+        self.image = pg.transform.rotate(game.bullet_img, -rot)
         self.game = game
         self.v = vec(BULLET_SPEED, 0).rotate(rot)
         self.rot = rot
-        self.image = pg.transform.rotate(game.bullet_img, -rot)
+        self.pos = vec(pos)
+
         self.rect = self.image.get_rect()
-        self.rect.center = pos
+        self.rect.center = vec(pos)
         self.spawn_time = pg.time.get_ticks()
 
     def update(self):
         if pg.time.get_ticks() - self.spawn_time > BULLET_LIFETIME:
             self.kill()
 
-        self.rect.centerx += self.v.x * self.game.dt
-        self.rect.centery += self.v.y * self.game.dt
+        self.pos = self.pos + (self.v * self.game.dt)
+        self.rect.center = self.pos

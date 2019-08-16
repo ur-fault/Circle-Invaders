@@ -6,6 +6,7 @@ import random
 from settings import *
 from sprites import *
 from os import path
+from random import randint
 
 
 class Game:
@@ -36,17 +37,17 @@ class Game:
         self.player_img = pg.transform.rotozoom(
             pg.image.load(
                 path.join(
-                    img_folder, 'player_img001.png')), 90, 1 / 15)
+                    img_folder, PLAYER_IMG)), 90, 1 / 15)
         self.earth_img = pg.transform.rotozoom(
             pg.image.load(
                 path.join(
-                    img_folder, 'earth001.png')), 0, 1 / 2)
+                    img_folder, EARTH_IMG)), 0, 1 / 2)
         self.bullet_img = pg.transform.rotozoom(
             pg.image.load(
                 path.join(
-                    img_folder, 'bullet001.png')), 270, 1 / 20)
+                    img_folder, BULLET_IMG)), 270, 1 / 20)
         self.font = pg.font.SysFont(
-            'consolas', 20, bold=3, italic=0, constructor=None)
+            'consolas', 20, bold=50, italic=0, constructor=None)
 
     def run(self):
         # Game Loop
@@ -59,6 +60,7 @@ class Game:
 
     def update(self):
         # Game Loop - Update
+        self.chance_for_enemy()
         self.all_sprites.update()
 
     def events(self):
@@ -75,7 +77,7 @@ class Game:
         self.screen.fill(BLACK)
         self.all_sprites.draw(self.screen)
         pg.display.set_caption('{} => {}'.format(
-            TITLE, int(self.clock.get_fps())))
+            TITLE, round(self.clock.get_fps(), 2)))
         # *after* drawing everything, flip the display
         pg.display.flip()
 
