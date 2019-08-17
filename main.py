@@ -63,10 +63,11 @@ class Game:
             pg.image.load(
                 path.join(
                     img_folder, BULLET_IMG)), 270, 1 / 20)
-        self.star_img = pg.transform.rotozoom(
-            pg.image.load(
-                path.join(
-                    img_folder, STAR_IMG)), 0, 1 / 2)
+        self.bgobject_imgs = []
+        for img_path in BGOBJECT_IMGS:
+            self.bgobject_imgs.append(
+                pg.image.load(
+                    path.join(img_folder, img_path)))
         self.invader_imgs = [pg.transform.rotozoom(
             pg.image.load(
                 path.join(
@@ -97,7 +98,7 @@ class Game:
 
     def update(self):
         # Game Loop - Update
-        self.chance_for_star()
+        self.chance_for_bgobject()
         self.chance_for_enemy()
         self.all_sprites.update()
         hits = pg.sprite.groupcollide(
@@ -182,17 +183,18 @@ class Game:
             rot_speed = randint(INVADER_MIN_ROT_SPEED, INVADER_MAX_ROT_SPEED)
             Invader(self, pos, vel, rot, rot_speed, img)
 
-    def chance_for_star(self):
+    def chance_for_bgobject(self):
         chance = round(randint(
-            0, int(1 / (INVADER_CHANCE + self.increase)) * 10) / 10, 0)
+            0, int(1 / (BGOBJECT_CHANCE)) * 10) / 10, 0)
         if chance == 0:
+            img = choice(self.bgobject_imgs)
             facing = randint(0, 360)
-            pos = vec(INVADER_OFFSET, 0).rotate(facing) + CENTER
-            vel = vec(randint(INVADER_MIN_SPEED, INVADER_MAX_SPEED),
+            pos = vec(BGOBJECT_OFFSET, 0).rotate(facing) + CENTER
+            vel = vec(randint(BGOBJECT_MIN_SPEED, BGOBJECT_MAX_SPEED),
                       0).rotate(facing - 180)
             rot = randint(0, 360)
-            rot_speed = randint(INVADER_MIN_ROT_SPEED, INVADER_MAX_ROT_SPEED)
-            Star(self, pos, vel, rot, rot_speed)
+            rot_speed = randint(BGOBJECT_MIN_ROT_SPEED, BGOBJECT_MAX_ROT_SPEED)
+            BGObject(self, pos, vel, rot, rot_speed, img)
 
 
 g = Game()

@@ -73,11 +73,15 @@ KILL_SCORE = 1100
 ONE_TICK = 16
 EXPLOSION_IMGS = ['explosion{}.png'.format(img) for img in range(1, 64, 1)]
 
-# BackGround objects (star)
-STAR_CHANCE = 1
-STAR_OFFSET = vec(400, 0)
-STAR_MIN_ROT_SPEED = 10
-STAR_MAX_ROT_SPEED = 180
-STAR_MIN_SPEED = 5
-STAR_MAX_SPEED = 40
-STAR_IMG = 'star001.png'
+# BackGround objects ()
+BGOBJECT_CHANCE = 0.01
+BGOBJECT_OFFSET = vec(400, 0)
+BGOBJECT_MIN_ROT_SPEED = 10
+BGOBJECT_MAX_ROT_SPEED = 15
+BGOBJECT_MIN_SPEED = 5
+BGOBJECT_MAX_SPEED = 30
+BGOBJECT_IMGS = [
+    'bgobj1.png',
+    'bgobj2.png',
+    'bgobj3.png',
+]

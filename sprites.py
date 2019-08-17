@@ -174,8 +174,8 @@ class Invader(pg.sprite.Sprite):
         self.rect.center = self.pos
 
 
-class Star(pg.sprite.Sprite):
-    def __init__(self, game, pos, vel, rot, rot_speed):
+class BGObject(pg.sprite.Sprite):
+    def __init__(self, game, pos, vel, rot, rot_speed, img):
         self.groups = game.all_sprites, game.bgobjects
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
@@ -185,7 +185,7 @@ class Star(pg.sprite.Sprite):
         self.rot = rot
         self.rot_speed = rot_speed
 
-        self.main_img = game.star_img
+        self.main_img = img
         self.image = pg.transform.rotate(self.main_img, self.rot)
         self.rect = self.image.get_rect()
         self.rect.center = self.pos
