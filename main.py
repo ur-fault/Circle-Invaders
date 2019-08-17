@@ -38,13 +38,14 @@ class Game:
         self.increase = 0
         self.step = 1
         self.step_checked = 0
+        self.shields = 0
         self.player = Player(self)
         # self.h1 = Helper_Timeout(self, self.player, 180)
         # self.b1 = Bomb(self, BOMB_OFFSET.rotate(30) + CENTER)
         self.earth = Earth(self)
 
-        self.score_text = Text(vec(30, HEIGHT - 30),
-                               YELLOW, self.player, 'Score', 3)
+        self.score_text = Text(vec(30, HEIGHT - 30), YELLOW, self.player, 'Score', 3)
+        self.shields_text = Text(vec(30, 30), BLUE, self.player, 'Shields', 7)
 
         # self.invaders_text = Text(
         #     vec(30, 30), RED, self.player, 'Invaders', 5)
@@ -53,14 +54,12 @@ class Game:
 
     def load_data(self):
         # Load game data
+        self.load_images()
+
         game_folder = path.dirname(__file__)
         img_folder = path.join(game_folder, 'img')
         explosion_folder = path.join(img_folder, 'explosions')
-        self.player_img = pg.transform.rotozoom(pg.image.load(path.join(img_folder, PLAYER_IMG)), 90, 1 / 15)
-        self.earth_img = pg.transform.rotozoom(pg.image.load(path.join(img_folder, EARTH_IMG)), 0, 1 / 2)
-        self.bullet_img = pg.transform.rotozoom(pg.image.load(path.join(img_folder, BULLET_IMG)), 270, 1 / 20)
-        self.helper_img = pg.transform.rotozoom(pg.image.load(path.join(img_folder, HELPER_IMG)), 90, 1 / 20)
-        self.bomb_img = pg.transform.rotozoom(pg.image.load(path.join(img_folder, BOMB_IMG)), 0, 1 / 20)
+        item_folder = path.join(img_folder, 'items')
         self.bgobject_imgs = []
         self.explosion_imgs = []
         self.item_imgs = {}
@@ -75,12 +74,24 @@ class Game:
             self.explosion_imgs.append(sur)
 
         for img_path in ITEM_IMGS:
-            self.item_imgs[img_path] = pg.transform.rotozoom(pg.image.load(path.join(img_folder, ITEM_IMGS[img_path])), 0,  1 / 1.3)
+            self.item_imgs[img_path] = pg.transform.rotozoom(pg.image.load(path.join(item_folder, ITEM_IMGS[img_path])), 0,  1 / 1.3)
 
         self.font = pg.font.SysFont(
             GAME_FONT, 20, bold=50, italic=0, constructor=None)
         self.title_font = pg.font.SysFont(
             GAME_FONT, 50, bold=50, italic=0, constructor=None)
+
+    def load_images(self):
+        # Load game data
+        game_folder = path.dirname(__file__)
+        img_folder = path.join(game_folder, 'img')
+        explosion_folder = path.join(img_folder, 'explosions')
+        item_folder = path.join(img_folder, 'items')
+        self.player_img = pg.transform.rotozoom(pg.image.load(path.join(img_folder, PLAYER_IMG)), 90, 1 / 15)
+        self.earth_img = pg.transform.rotozoom(pg.image.load(path.join(img_folder, EARTH_IMG)), 0, 1 / 2)
+        self.bullet_img = pg.transform.rotozoom(pg.image.load(path.join(img_folder, BULLET_IMG)), 270, 1 / 20)
+        self.helper_img = pg.transform.rotozoom(pg.image.load(path.join(img_folder, HELPER_IMG)), 90, 1 / 20)
+        self.bomb_img = pg.transform.rotozoom(pg.image.load(path.join(img_folder, BOMB_IMG)), 0, 1 / 20)
 
     def run(self):
         # Game Loop
@@ -116,7 +127,12 @@ class Game:
 
         for invader in self.invaders:
             if pg.sprite.collide_circle(self.earth, invader):
-                self.playing = False
+                Explosion(self, invader.pos)
+                invader.kill()
+                if self.shields > 0:
+                    self.shields -= 1
+                else:
+                    self.playing = False
 
         for object in self.all_sprites:
             if not SCREEN_WITH_OFFSET.colliderect(object.rect):
@@ -210,10 +226,7 @@ class Game:
             0, int(1 / (ITEM_CHANCE)) * 10 - 10) / 10, 0)
         if chance == 0.0:
             item = choice(ITEMS_CHANCE)
-            if item == 'bomb':
-                Item(self, pos, item, vel)
-            elif item == 'helper':
-                Item(self, pos, item, vel)
+            Item(self, pos, item, vel)
 
 
 g = Game()

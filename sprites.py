@@ -87,6 +87,8 @@ class Text(pg.sprite.Sprite):
             self.value = len(parent.game.invaders)
         elif option == 6:
             self.value = len(parent.game.bgobjects)
+        elif option == 7:
+            self.value = parent.game.shields
 
         self.image = parent.game.font.render(
             '{} => {}'.format(text, parent.speed), False, color)
@@ -112,6 +114,8 @@ class Text(pg.sprite.Sprite):
             self.value = len(self.parent.game.invaders)
         elif self.option == 6:
             self.value = len(self.parent.game.bgobjects)
+        elif self.option == 7:
+            self.value = self.parent.game.shields
         self.image = self.parent.game.font.render('{} => {}'.format(
             self.text, round(self.value, 3)), False, self.color)
 
@@ -335,3 +339,5 @@ class Item(pg.sprite.Sprite):
                     sprite.rot_offset = 360 / len(self.game.main) * n
 
             Helper_Timeout(self.game, self.game.player, rot_offset)
+        elif self.type == 'shield':
+            self.game.shields += 1

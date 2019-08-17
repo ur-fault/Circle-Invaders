@@ -69,7 +69,7 @@ EARTH_ROT_SPEED = 10
 
 # Score's settings
 SCORE_STEP = 10000
-SCORE_INVADER_INCREASE = 0.005
+SCORE_INVADER_INCREASE = 0.003
 SCORE_BULLET_DECREASE = 100
 KILL_SCORE = 1100
 
@@ -102,11 +102,11 @@ BOMB_OFFSET = vec(150, 0)
 BOMB_IMG = 'bomb001.png'
 
 # Items properities
-ITEMS_CHANCE = ['bomb', 'helper']
-# ITEMS_CHANCE = ['helper']
+# ITEMS_CHANCE = ['bomb', 'bomb', 'bomb', 'bomb', 'helper', 'helper', 'shield']
+ITEMS_CHANCE = ['shield']
 ITEM_CHANCE = 1
 ITEM_IMGS = {'bomb': 'bomb_item002.png',
              'helper': 'helper_item002.png'
              }
-# ITEM_IMGS = {
-#     'helper': 'helper_item001.png'}
+ITEM_IMGS = {
+    'shield': 'shield_item001.png'}
