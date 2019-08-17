@@ -12,6 +12,8 @@ SCREEN_WITH_OFFSET = pg.Rect(-SCREEN_OFFSET, -SCREEN_OFFSET,
                              HEIGHT + 2 * SCREEN_OFFSET)
 FPS = 60
 CENTER = vec(WIDTH / 2, HEIGHT / 2)
+GAME_FONT = 'consolas'
+# GAME_FONT = 'arial'
 
 
 # define colors
@@ -39,7 +41,7 @@ PLAYER_SLOW_SPEED = 10
 PLAYER_MAX_SPEED = 25
 PLAYER_IMG = 'player001.png'
 PLAYER_FIRE_RATE = 120
-CENTER_OFFSET = 90
+CENTER_OFFSET = vec(90, 0)
 BARREL_OFFSET = vec(12, 0)
 
 # Invader's settings
@@ -63,7 +65,7 @@ BULLET_IMG = 'bullet001.png'
 
 # Earth's settings
 EARTH_IMG = 'earth001.png'
-EARTH_ROT_SPEED = 15
+EARTH_ROT_SPEED = 10
 
 # Score's settings
 SCORE_STEP = 10000
@@ -92,3 +94,19 @@ BGOBJECT_IMGS = [
 HELPER_LIFETIME = 15000
 HELPER_IMG = 'helper001.png'
 HELPER_FIRE_RATE = 350
+
+# Bomb's settings
+BOMB_MIN_ROT_SPEED = 10
+BOMB_MAX_ROT_SPEED = 15
+BOMB_OFFSET = vec(150, 0)
+BOMB_IMG = 'bomb001.png'
+
+# Items properities
+ITEMS_CHANCE = ['bomb', 'helper']
+# ITEMS_CHANCE = ['helper']
+ITEM_CHANCE = 1
+ITEM_IMGS = {'bomb': 'bomb_item001.png',
+             'helper': 'helper_item001.png'
+             }
+# ITEM_IMGS = {
+#     'helper': 'helper_item001.png'}

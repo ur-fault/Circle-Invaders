@@ -10,19 +10,20 @@ class Player(pg.sprite.Sprite):
         self.groups = game.all_sprites, game.main
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = game.player_img
 
         self.rot = 270
         self.speed = 0
         self.vel = 0
-        self.pos = vec(CENTER_OFFSET, 0).rotate(self.rot) + CENTER
+        self.pos = CENTER_OFFSET.rotate(self.rot) + CENTER
 
         self.last_shot = 0
 
         self.score = 0
 
+        self.image = game.player_img
         self.rect = self.image.get_rect()
         self.rect.center = self.pos
+        self.mask = pg.mask.from_surface(self.image)
 
     def get_keys(self):
         self.vel = 0
@@ -63,7 +64,7 @@ class Player(pg.sprite.Sprite):
 
         self.image = pg.transform.rotate(self.game.player_img, -self.rot + 180)
         self.rect = self.image.get_rect()
-        self.pos = vec(CENTER_OFFSET, 0).rotate(self.rot) + CENTER
+        self.pos = CENTER_OFFSET.rotate(self.rot) + CENTER
         self.rect.center = self.pos
 
 
@@ -140,7 +141,7 @@ class Bullet(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self, self.groups)
         self.image = pg.transform.rotate(game.bullet_img, -rot)
         self.game = game
-        self.v = vec(BULLET_SPEED, 0).rotate(rot)
+        self.vel = vec(BULLET_SPEED, 0).rotate(rot)
         self.rot = rot
         self.pos = vec(pos)
 
@@ -152,7 +153,7 @@ class Bullet(pg.sprite.Sprite):
         if pg.time.get_ticks() - self.spawn_time > BULLET_LIFETIME:
             self.kill()
 
-        self.pos = self.pos + (self.v * self.game.dt)
+        self.pos = self.pos + (self.vel * self.game.dt)
         self.rect.center = self.pos
 
 
@@ -171,7 +172,7 @@ class Invader(pg.sprite.Sprite):
         self.image = pg.transform.rotate(self.main_img, self.rot)
         self.rect = self.image.get_rect()
         self.rect.center = self.pos
-        self.radius = self.rect.width / 2
+        self.radius = max(self.rect.width / 2, self.rect.height / 2)
 
     def update(self):
         self.pos = self.pos + (self.vel * self.game.dt)
@@ -227,7 +228,7 @@ class Explosion(pg.sprite.Sprite):
 
     def update(self):
         lifetime = pg.time.get_ticks() - self.spawn_time
-        if lifetime > len(EXPLOSION_IMGS) * 15:
+        if lifetime > len(EXPLOSION_IMGS) * 14:
             self.kill()
         self.image = self.game.explosion_imgs[int(lifetime / 16) - 1]
 
@@ -241,17 +242,27 @@ class Helper_Timeout(pg.sprite.Sprite):
 
         self.rot = parent.rot + rot_offset
         self.rot_offset = rot_offset
-        self.pos = vec(CENTER_OFFSET, 0).rotate(self.rot) + CENTER
+        self.pos = CENTER_OFFSET.rotate(self.rot) + CENTER
 
         self.image = pg.transform.rotate(game.helper_img, -self.rot + 180)
         self.rect = self.image.get_rect()
         self.rect.center = self.pos
 
         self.last_shot = 0
+        self.spawn_time = pg.time.get_ticks()
 
     def update(self):
+        if pg.time.get_ticks() - self.spawn_time > HELPER_LIFETIME:
+            n = 0
+            for sprite in self.game.main:
+                if isinstance(sprite, Helper_Timeout) and sprite is not self:
+                    n += 1
+                    sprite.rot_offset = 360 / (len(self.game.main) - 2) * n
+                    Explosion(self.game, self.pos)
+            self.kill()
+
         self.rot = self.parent.rot + self.rot_offset
-        self.pos = vec(CENTER_OFFSET, 0).rotate(self.rot) + CENTER
+        self.pos = CENTER_OFFSET.rotate(self.rot) + CENTER
 
         self.image = pg.transform.rotate(self.game.helper_img, -self.rot + 180)
         self.rect = self.image.get_rect()
@@ -268,3 +279,59 @@ class Helper_Timeout(pg.sprite.Sprite):
             Bullet(self.game, self.pos + BARREL_OFFSET.rotate(self.rot),
                    self.rot)
             self.last_shot = now
+
+
+class Bomb(pg.sprite.Sprite):
+    def __init__(self, game, pos):
+        self.groups = game.all_sprites, game.objects, game.bombs
+        pg.sprite.Sprite.__init__(self, self.groups)
+
+        self.game = game
+        self.pos = pos
+
+        self.image = game.bomb_img
+        self.rect = self.image.get_rect()
+        self.rect.center = pos
+
+    def update(self):
+        hits = pg.sprite.spritecollide(self, self.game.invaders, False)
+        for hit in hits:
+            Explosion(self.game, self.pos)
+            Explosion(self.game, hit.pos)
+            self.game.chance_for_item(hit.pos, hit.vel)
+            hit.kill()
+            self.kill()
+
+
+class Item(pg.sprite.Sprite):
+    def __init__(self, game, pos, type, vel):
+        self.groups = game.all_sprites, game.items
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+
+        self.vel = vel
+        self.pos = pos
+        self.type = type
+
+        self.image = game.item_imgs[type]
+        self.rect = self.image.get_rect()
+        self.rect.center = pos
+        self.mask = pg.mask.from_surface(self.image)
+
+    def update(self):
+        self.pos += self.vel * self.game.dt
+        self.rect.center = self.pos
+
+    def use(self):
+        if self.type == 'bomb':
+            dir = self.vel.angle_to(vec(0, 0)) - 180
+            Bomb(self.game, BOMB_OFFSET.rotate(-dir) + CENTER)
+        elif self.type == 'helper':
+            rot_offset = 360 - (360 / len(self.game.main))
+            n = 0
+            for sprite in self.game.main:
+                if isinstance(sprite, Helper_Timeout):
+                    n += 1
+                    sprite.rot_offset = 360 / len(self.game.main) * n
+
+            Helper_Timeout(self.game, self.game.player, rot_offset)
