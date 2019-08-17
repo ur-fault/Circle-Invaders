@@ -201,7 +201,7 @@ class Game:
                 uniform(
                     BGOBJECT_MIN_SPEED, BGOBJECT_MAX_SPEED), 0).rotate(facing)
             rot = randint(0, 360)
-            rot_speed = randint(INVADER_MIN_ROT_SPEED, INVADER_MAX_ROT_SPEED)
+            rot_speed = randint(BGOBJECT_MIN_ROT_SPEED, BGOBJECT_MAX_ROT_SPEED)
             BGObject(self, pos, vel, rot, rot_speed, img)
 
 
