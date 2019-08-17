@@ -34,11 +34,14 @@ class Player(pg.sprite.Sprite):
 
         if keys[pg.K_SPACE]:
             now = pg.time.get_ticks()
-            if now - self.last_shot > BULLET_RATE:
+            if now - self.last_shot > PLAYER_FIRE_RATE:
                 self.last_shot = now
                 Bullet(self.game, self.pos + BARREL_OFFSET.rotate(self.rot),
                        self.rot)
                 self.score -= SCORE_BULLET_DECREASE
+                for sprite in self.game.main:
+                    if isinstance(sprite, Helper_Timeout):
+                        sprite.shoot()
 
     def update(self):
         self.get_keys()
@@ -116,11 +119,19 @@ class Earth(pg.sprite.Sprite):
     def __init__(self, game):
         self.groups = game.all_sprites, game.main
         pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
         self.image = game.earth_img
 
         self.rect = self.image.get_rect()
-        self.rect.center = (WIDTH / 2, HEIGHT / 2)
+        self.rect.center = CENTER
         self.radius = self.rect.width / 2
+        self.rot = 0
+
+    def update(self):
+        self.rot += EARTH_ROT_SPEED * self.game.dt
+        self.image = pg.transform.rotate(self.game.earth_img, self.rot)
+        self.rect = self.image.get_rect()
+        self.rect.center = CENTER
 
 
 class Bullet(pg.sprite.Sprite):
@@ -219,3 +230,41 @@ class Explosion(pg.sprite.Sprite):
         if lifetime > len(EXPLOSION_IMGS) * 15:
             self.kill()
         self.image = self.game.explosion_imgs[int(lifetime / 16) - 1]
+
+
+class Helper_Timeout(pg.sprite.Sprite):
+    def __init__(self, game, parent, rot_offset):
+        self.groups = game.all_sprites, game.main
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.parent = parent
+
+        self.rot = parent.rot + rot_offset
+        self.rot_offset = rot_offset
+        self.pos = vec(CENTER_OFFSET, 0).rotate(self.rot) + CENTER
+
+        self.image = pg.transform.rotate(game.helper_img, -self.rot + 180)
+        self.rect = self.image.get_rect()
+        self.rect.center = self.pos
+
+        self.last_shot = 0
+
+    def update(self):
+        self.rot = self.parent.rot + self.rot_offset
+        self.pos = vec(CENTER_OFFSET, 0).rotate(self.rot) + CENTER
+
+        self.image = pg.transform.rotate(self.game.helper_img, -self.rot + 180)
+        self.rect = self.image.get_rect()
+        self.rect.center = self.pos
+
+        # if now - self.last_shot > HELPER_FIRE_RATE:
+        #     Bullet(self.game, self.pos + BARREL_OFFSET.rotate(self.rot),
+        #            self.rot)
+        #     self.last_shot = now
+
+    def shoot(self):
+        now = pg.time.get_ticks()
+        if now - self.last_shot > HELPER_FIRE_RATE:
+            Bullet(self.game, self.pos + BARREL_OFFSET.rotate(self.rot),
+                   self.rot)
+            self.last_shot = now

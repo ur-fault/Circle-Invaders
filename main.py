@@ -7,7 +7,7 @@ import random
 from settings import *
 from sprites import *
 from os import path
-from random import randint, choice
+from random import randint, choice, uniform
 vec = pg.math.Vector2
 
 
@@ -36,6 +36,7 @@ class Game:
         self.step = 1
         self.step_checked = 0
         self.player = Player(self)
+        self.h1 = Helper_Timeout(self, self.player, 120)
         self.earth = Earth(self)
 
         self.score_text = Text(vec(30, HEIGHT - 30),
@@ -63,6 +64,10 @@ class Game:
             pg.image.load(
                 path.join(
                     img_folder, BULLET_IMG)), 270, 1 / 20)
+        self.helper_img = pg.transform.rotozoom(
+            pg.image.load(
+                path.join(
+                    img_folder, HELPER_IMG)), 90, 1 / 20)
         self.bgobject_imgs = []
         for img_path in BGOBJECT_IMGS:
             self.bgobject_imgs.append(
@@ -156,6 +161,7 @@ class Game:
         title_rect.center = TITLE_POS
         answered = False
         while not answered:
+            self.clock.tick(FPS)
             self.events()
             keys = pg.key.get_pressed()
             for key in keys:
@@ -188,12 +194,14 @@ class Game:
             0, int(1 / (BGOBJECT_CHANCE)) * 10) / 10, 0)
         if chance == 0:
             img = choice(self.bgobject_imgs)
-            facing = randint(0, 360)
-            pos = vec(BGOBJECT_OFFSET, 0).rotate(facing) + CENTER
-            vel = vec(randint(BGOBJECT_MIN_SPEED, BGOBJECT_MAX_SPEED),
-                      0).rotate(facing - 180)
+            facing_pos = uniform(0, 360)
+            pos = vec(BGOBJECT_OFFSET, 0).rotate(facing_pos) + CENTER
+            facing = uniform(0, 360)
+            vel = vec(
+                uniform(
+                    BGOBJECT_MIN_SPEED, BGOBJECT_MAX_SPEED), 0).rotate(facing)
             rot = randint(0, 360)
-            rot_speed = randint(BGOBJECT_MIN_ROT_SPEED, BGOBJECT_MAX_ROT_SPEED)
+            rot_speed = randint(INVADER_MIN_ROT_SPEED, INVADER_MAX_ROT_SPEED)
             BGObject(self, pos, vel, rot, rot_speed, img)
 
 
