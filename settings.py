@@ -105,8 +105,8 @@ BOMB_IMG = 'bomb001.png'
 ITEMS_CHANCE = ['bomb', 'helper']
 # ITEMS_CHANCE = ['helper']
 ITEM_CHANCE = 1
-ITEM_IMGS = {'bomb': 'bomb_item001.png',
-             'helper': 'helper_item001.png'
+ITEM_IMGS = {'bomb': 'bomb_item002.png',
+             'helper': 'helper_item002.png'
              }
 # ITEM_IMGS = {
 #     'helper': 'helper_item001.png'}

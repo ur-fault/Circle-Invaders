@@ -60,8 +60,7 @@ class Game:
         self.earth_img = pg.transform.rotozoom(pg.image.load(path.join(img_folder, EARTH_IMG)), 0, 1 / 2)
         self.bullet_img = pg.transform.rotozoom(pg.image.load(path.join(img_folder, BULLET_IMG)), 270, 1 / 20)
         self.helper_img = pg.transform.rotozoom(pg.image.load(path.join(img_folder, HELPER_IMG)), 90, 1 / 20)
-        self.helper_img = pg.transform.rotozoom(pg.image.load(path.join(img_folder, HELPER_IMG)), 90, 1 / 20)
-        self.bomb_img = pg.transform.rotozoom(pg.image.load(path.join(img_folder, BOMB_IMG)), 0, 1 / 15)
+        self.bomb_img = pg.transform.rotozoom(pg.image.load(path.join(img_folder, BOMB_IMG)), 0, 1 / 20)
         self.bgobject_imgs = []
         self.explosion_imgs = []
         self.item_imgs = {}
@@ -76,7 +75,7 @@ class Game:
             self.explosion_imgs.append(sur)
 
         for img_path in ITEM_IMGS:
-            self.item_imgs[img_path] = pg.transform.rotozoom(pg.image.load(path.join(img_folder, ITEM_IMGS[img_path])), 0,  1 / 16)
+            self.item_imgs[img_path] = pg.transform.rotozoom(pg.image.load(path.join(img_folder, ITEM_IMGS[img_path])), 0,  1 / 1.3)
 
         self.font = pg.font.SysFont(
             GAME_FONT, 20, bold=50, italic=0, constructor=None)
