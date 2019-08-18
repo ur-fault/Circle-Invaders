@@ -4,10 +4,10 @@ import pygame as pg
 import ctypes
 vec = pg.math.Vector2
 
-ctypes.windll.user32.SetProcessDPIAware()
-true_res = (ctypes.windll.user32.GetSystemMetrics(0), ctypes.windll.user32.GetSystemMetrics(1))
 
 # game options/settings
+ctypes.windll.user32.SetProcessDPIAware()
+true_res = (ctypes.windll.user32.GetSystemMetrics(0), ctypes.windll.user32.GetSystemMetrics(1))
 SCREEN = pg.display.set_mode(true_res, pg.FULLSCREEN | pg.DOUBLEBUF)
 SCREEN_WIDTH = SCREEN.get_width()
 SCREEN_HEIGHT = SCREEN.get_height()
@@ -15,13 +15,12 @@ print('Screen size is {}:{}'.format(SCREEN_WIDTH, SCREEN_HEIGHT))
 WIDTH = min(SCREEN.get_width(), SCREEN.get_height())
 HEIGHT = WIDTH
 SCREEN_OFFSET = WIDTH / 2
-SCREEN_WITH_OFFSET = pg.Rect(-SCREEN_OFFSET, -SCREEN_OFFSET,
-                             WIDTH + 2 * SCREEN_OFFSET,
-                             HEIGHT + 2 * SCREEN_OFFSET)
+SCREEN_WITH_OFFSET = pg.Rect(-SCREEN_OFFSET, -SCREEN_OFFSET, WIDTH + 2 * SCREEN_OFFSET, HEIGHT + 2 * SCREEN_OFFSET)
 FPS = 120
 CENTER = vec(WIDTH / 2, HEIGHT / 2)
 SCREEN_CENTER = vec(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 GAME_FONT = 'consolas'
+HS_FILE = 'highscore.txt'
 # GAME_FONT = 'arial'
 
 
@@ -113,9 +112,9 @@ BOOSTER_LIFETIME = 15000
 
 # Items properities
 ITEMS = {
-    'bomb': 12,
+    'bomb': 10,
     'helper': 6,
-    'shield': 3,
+    'shield': 2,
     'tornado': 1,
     'rate_booster': 6
 }
@@ -130,13 +129,10 @@ ITEMS_CHANCE = []
 for item in ITEMS:
     for chance in range(0, ITEMS[item]):
         ITEMS_CHANCE.append(item)
-ITEM_CHANCE = 0.3
+ITEM_CHANCE = 0.8
 ITEM_IMGS = {'bomb': 'bomb_item002.png',
              'helper': 'helper_item002.png',
              'shield': 'shield_item001.png',
              'tornado': 'tornado_item001.png',
              'rate_booster': 'rate_booster_item001.png'
              }
-# print(ITEMS)
-# print(ITEMS_CHANCE)
-# print(ITEM_IMGS)

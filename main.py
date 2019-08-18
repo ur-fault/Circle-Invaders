@@ -7,6 +7,7 @@ import random
 from settings import *
 from sprites import *
 from os import path
+from os import makedirs
 from random import randint, choice, uniform
 vec = pg.math.Vector2
 
@@ -19,7 +20,6 @@ class Game:
         self.screen = pg.Surface((WIDTH, HEIGHT))
         self.screen_rect = self.screen.get_rect()
         self.screen_rect.center = SCREEN_CENTER
-        print('Game field is {}:{}'.format(WIDTH, HEIGHT))
         pg.display.set_caption(TITLE)
         self.clock = pg.time.Clock()
         self.running = True
@@ -27,6 +27,7 @@ class Game:
 
     def new(self):
         # start a new game
+        # create all sprite groups
         self.all_sprites = pg.sprite.Group()
         self.bullets = pg.sprite.Group()
         self.invaders = pg.sprite.Group()
@@ -38,69 +39,58 @@ class Game:
         self.bombs = pg.sprite.Group()
         self.items = pg.sprite.Group()
 
+        # set boosters
         self.increase = 0
         self.step = 1
         self.step_checked = 0
         self.shields = 1
         self.booster = 0
+
+        # create main objects
         self.player = Player(self)
-        # self.h1 = Helper(self, self.player, 180)
-        # self.b1 = Bomb(self, BOMB_OFFSET.rotate(30) + CENTER)
         self.earth = Earth(self)
 
+        # setup texts
         self.score_text = Text(vec(30, HEIGHT - 30), YELLOW, self.player, 'Score', 3)
         self.shields_text = Text(vec(30, 30), BLUE, self.player, 'Shields', 7)
         self.booster_text = Text(vec(30, 60), RED, self.player, 'Boosters', 8)
         self.fps_text = Text(vec(30, 90), GREEN, self.player, 'FPS', 9)
 
-        # self.invaders_text = Text(
-        #     vec(30, 30), RED, self.player, 'Invaders', 5)
-
+        # and then start the game
         self.run()
 
     def load_data(self):
         # Load game data
+        home_dir = path.expanduser('~')
+        self.data_folder = path.join(home_dir, path.join('etmoco', 'circleinvaders'))
+        if not path.exists(data_folder):
+            makedirs(data_folder)
+        with open(path.join(data_folder, HS_FILE), 'w') as f:
+            try:
+                self.highscore = int(f.read())
+            except:
+                self.highscore = 0
+                f.write(str(self.highscore))
+
         self.load_images()
 
-        game_folder = path.dirname(__file__)
-        img_folder = path.join(game_folder, 'img')
-        explosion_folder = path.join(img_folder, 'explosions')
-        item_folder = path.join(img_folder, 'items')
-        self.bgobject_imgs = []
-        self.explosion_imgs = []
-        self.invader_imgs = []
-        self.item_imgs = {}
-
-        for img_path in BGOBJECT_IMGS:
-            self.bgobject_imgs.append(pg.image.load(path.join(img_folder, img_path)).convert_alpha())
-        for img_path in INVADER_IMGS:
-            sur = pg.image.load(path.join(img_folder, img_path)).convert_alpha()
-            surwidth = int(WIDTH / 16)
-            surheight = int(surwidth / (sur.get_rect().width / sur.get_rect().height))
-            self.invader_imgs.append(pg.transform.scale(sur, (surwidth, surheight)))
-
-        for img_path in EXPLOSION_IMGS:
-            sur = pg.image.load(path.join(explosion_folder, img_path))
-            sur.set_colorkey(BLACK)
-            self.explosion_imgs.append(sur)
-
-        for img_path in ITEM_IMGS:
-            sur = pg.image.load(path.join(item_folder, ITEM_IMGS[img_path])).convert_alpha()
-            surwidth = min(int(WIDTH / 21), 24)
-            surheight = int(surwidth / (sur.get_rect().width / sur.get_rect().height))
-            self.item_imgs[img_path] = pg.transform.scale(sur, (surwidth, surheight))
-
+        # create game fonts
         self.font = pg.font.SysFont(
             GAME_FONT, min(int(WIDTH / 25.6), 20), bold=50, italic=0, constructor=None)
         self.title_font = pg.font.SysFont(
             GAME_FONT, int(WIDTH / 15), bold=50, italic=0, constructor=None)
 
     def load_images(self):
-        # Load game data
+        # Load game images
         game_folder = path.dirname(__file__)
         img_folder = path.join(game_folder, 'img')
         explosion_folder = path.join(img_folder, 'explosions')
         item_folder = path.join(img_folder, 'items')
+
+        self.bgobject_imgs = []
+        self.explosion_imgs = []
+        self.invader_imgs = []
+        self.item_imgs = {}
 
         sur = pg.image.load(path.join(img_folder, PLAYER_IMG)).convert_alpha()
         surwidth = int(WIDTH / 8)
@@ -126,6 +116,26 @@ class Game:
         surwidth = int(WIDTH / 20)
         surheight = int(surwidth / (sur.get_rect().width / sur.get_rect().height))
         self.bomb_img = pg.transform.scale(sur, (surwidth, surheight))
+
+        for img_path in BGOBJECT_IMGS:
+            self.bgobject_imgs.append(pg.image.load(path.join(img_folder, img_path)).convert_alpha())
+
+        for img_path in INVADER_IMGS:
+            sur = pg.image.load(path.join(img_folder, img_path)).convert_alpha()
+            surwidth = int(WIDTH / 16)
+            surheight = int(surwidth / (sur.get_rect().width / sur.get_rect().height))
+            self.invader_imgs.append(pg.transform.scale(sur, (surwidth, surheight)))
+
+        for img_path in EXPLOSION_IMGS:
+            sur = pg.image.load(path.join(explosion_folder, img_path))
+            sur.set_colorkey(BLACK)
+            self.explosion_imgs.append(sur)
+
+        for img_path in ITEM_IMGS:
+            sur = pg.image.load(path.join(item_folder, ITEM_IMGS[img_path])).convert_alpha()
+            surwidth = min(int(WIDTH / 21), 24)
+            surheight = int(surwidth / (sur.get_rect().width / sur.get_rect().height))
+            self.item_imgs[img_path] = pg.transform.scale(sur, (surwidth, surheight))
 
     def run(self):
         # Game Loop
@@ -154,8 +164,8 @@ class Game:
                 item.use()
                 item.kill()
 
-        if self.player.score > SCORE_STEP * self.step and \
-                self.step_checked < self.step:
+        if self.player.score > SCORE_STEP * self.step and self.step_checked < self.step:
+            self.step_checked += 1
             self.step += 1
             self.increase += SCORE_INVADER_INCREASE
 
@@ -167,6 +177,8 @@ class Game:
                     self.shields -= 1
                 else:
                     self.playing = False
+                    with open(path.join(self.data_folder, HS_FILE), 'w') as f:
+                        
 
         for object in self.all_sprites:
             if not isinstance(object, Rate_Booster):
@@ -182,6 +194,7 @@ class Game:
                     self.playing = False
                 self.running = False
 
+        # check for escape button
         for idx, key in enumerate(pg.key.get_pressed()):
             if idx == pg.K_ESCAPE and key:
                 if self.playing:
@@ -191,7 +204,6 @@ class Game:
     def draw(self):
         # Game Loop - draw
         self.screen.fill(BGCOLOR)
-        SCREEN.fill(BGCOLOR)
         # self.all_sprites.draw(self.screen)
         self.bgobjects.draw(self.screen)
         self.bullets.draw(self.screen)
@@ -206,26 +218,32 @@ class Game:
         # *after* drawing everything, flip the display
         # print('Pos to blit is {}:{}'.format((SCREEN_WIDTH - WIDTH) // 2, (SCREEN_HEIGHT - HEIGHT) // 2))
         SCREEN.blit(self.screen, self.screen_rect)
-        pg.display.flip()
+        offset = 300
+        pg.display.update(self.screen_rect)
 
     def show_start_screen(self):
         # game splash/start screen
-        self.screen.fill(BGCOLOR)
         title = self.title_font.render(TITLE, False, TITLE_COLOR)
         title_rect = title.get_rect()
         title_rect.center = TITLE_POS
+        self.screen.fill(BGCOLOR)
+        SCREEN.fill(BGCOLOR)
+        self.screen.blit(title, title_rect)
+        SCREEN.blit(self.screen, self.screen_rect)
+        pg.display.flip()
         answered = False
         while not answered:
-            self.clock.tick(FPS)
-            self.events()
-            keys = pg.key.get_pressed()
-            for key in keys:
-                if key:
+            self.clock.tick(FPS // 2)
+            for e in pg.event.get():
+                if e.type == pg.QUIT:
+                    self.playing = False
+                    self.running = False
+                if e.type == pg.KEYUP:
                     answered = True
-
-            self.screen.fill(BGCOLOR)
-            self.screen.blit(title, title_rect)
-            pg.display.flip()
+            keys = pg.key.get_pressed()
+            if keys[pg.K_ESCAPE]:
+                self.playing = False
+                self.running = False
 
     def show_go_screen(self):
         # game over/continue
@@ -261,7 +279,7 @@ class Game:
 
     def chance_for_item(self, pos, vel):
         chance = round(uniform(
-            0, int(1 / (ITEM_CHANCE)) * 10 - 10) / 10, 0)
+            0, (self.step / (ITEM_CHANCE)) * 10 - 10) / 10, 0)
         if chance == 0.0:
             item = choice(ITEMS_CHANCE)
             Item(self, pos, item, vel)

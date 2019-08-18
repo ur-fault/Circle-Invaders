@@ -17,6 +17,7 @@ class Player(pg.sprite.Sprite):
         self.pos = CENTER_OFFSET.rotate(self.rot) + CENTER
 
         self.last_shot = 0
+        self.last_normal_shot = 0
 
         self.score = 0
 
@@ -39,10 +40,12 @@ class Player(pg.sprite.Sprite):
                 self.last_shot = now
                 Bullet(self.game, self.pos + BARREL_OFFSET.rotate(self.rot),
                        self.rot)
-                self.score -= SCORE_BULLET_DECREASE
                 for sprite in self.game.main:
                     if isinstance(sprite, Helper):
                         sprite.shoot()
+            if now - self.last_normal_shot > PLAYER_FIRE_RATE:
+                self.last_normal_shot = now
+                self.score -= SCORE_BULLET_DECREASE * self.game.step
 
     def update(self):
         self.get_keys()
@@ -280,16 +283,10 @@ class Helper(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = self.pos
 
-        # if now - self.last_shot > HELPER_FIRE_RATE:
-        #     Bullet(self.game, self.pos + BARREL_OFFSET.rotate(self.rot),
-        #            self.rot)
-        #     self.last_shot = now
-
     def shoot(self):
         now = pg.time.get_ticks()
-        if now - self.last_shot > HELPER_FIRE_RATE / (self.game.booster + 1):
-            Bullet(self.game, self.pos + BARREL_OFFSET.rotate(self.rot),
-                   self.rot)
+        if now - self.last_shot > HELPER_FIRE_RATE:
+            Bullet(self.game, self.pos + BARREL_OFFSET.rotate(self.rot), self.rot)
             self.last_shot = now
 
 
