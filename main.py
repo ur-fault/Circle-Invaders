@@ -51,7 +51,7 @@ class Game:
         self.score_text = Text(vec(30, HEIGHT - 30), YELLOW, self.player, 'Score', 3)
         self.shields_text = Text(vec(30, 30), BLUE, self.player, 'Shields', 7)
         self.booster_text = Text(vec(30, 60), RED, self.player, 'Boosters', 8)
-        self.fps_text = Text(vec(), color, parent, text, option)
+        self.fps_text = Text(vec(30, 90), GREEN, self.player, 'FPS', 9)
 
         # self.invaders_text = Text(
         #     vec(30, 30), RED, self.player, 'Invaders', 5)

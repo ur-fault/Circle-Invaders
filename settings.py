@@ -8,7 +8,7 @@ ctypes.windll.user32.SetProcessDPIAware()
 true_res = (ctypes.windll.user32.GetSystemMetrics(0), ctypes.windll.user32.GetSystemMetrics(1))
 
 # game options/settings
-SCREEN = pg.display.set_mode(true_res, pg.FULLSCREEN)
+SCREEN = pg.display.set_mode(true_res, pg.FULLSCREEN | pg.DOUBLEBUF)
 SCREEN_WIDTH = SCREEN.get_width()
 SCREEN_HEIGHT = SCREEN.get_height()
 print('Screen size is {}:{}'.format(SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -18,7 +18,7 @@ SCREEN_OFFSET = WIDTH / 2
 SCREEN_WITH_OFFSET = pg.Rect(-SCREEN_OFFSET, -SCREEN_OFFSET,
                              WIDTH + 2 * SCREEN_OFFSET,
                              HEIGHT + 2 * SCREEN_OFFSET)
-FPS = 60
+FPS = 120
 CENTER = vec(WIDTH / 2, HEIGHT / 2)
 SCREEN_CENTER = vec(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 GAME_FONT = 'consolas'
