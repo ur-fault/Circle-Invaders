@@ -91,6 +91,8 @@ class Text(pg.sprite.Sprite):
             self.value = parent.game.shields
         elif option == 8:
             self.value = parent.game.booster + 1
+        elif option == 9:
+            self.value = parent.game.clock.get_fps()
 
         self.image = parent.game.font.render(
             '{} => {}'.format(text, parent.speed), False, color)
@@ -120,6 +122,8 @@ class Text(pg.sprite.Sprite):
             self.value = self.parent.game.shields
         elif self.option == 8:
             self.value = self.parent.game.booster + 1
+        elif self.option == 9:
+            self.value = self.parent.game.clock.get_fps()
         self.image = self.parent.game.font.render('{} => {}'.format(
             self.text, round(self.value, 3)), False, self.color)
 
