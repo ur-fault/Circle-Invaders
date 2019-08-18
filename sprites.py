@@ -35,13 +35,13 @@ class Player(pg.sprite.Sprite):
 
         if keys[pg.K_SPACE]:
             now = pg.time.get_ticks()
-            if now - self.last_shot > PLAYER_FIRE_RATE:
+            if now - self.last_shot > PLAYER_FIRE_RATE / (self.game.booster + 1):
                 self.last_shot = now
                 Bullet(self.game, self.pos + BARREL_OFFSET.rotate(self.rot),
                        self.rot)
                 self.score -= SCORE_BULLET_DECREASE
                 for sprite in self.game.main:
-                    if isinstance(sprite, Helper_Timeout):
+                    if isinstance(sprite, Helper):
                         sprite.shoot()
 
     def update(self):
@@ -89,6 +89,8 @@ class Text(pg.sprite.Sprite):
             self.value = len(parent.game.bgobjects)
         elif option == 7:
             self.value = parent.game.shields
+        elif option == 8:
+            self.value = parent.game.booster + 1
 
         self.image = parent.game.font.render(
             '{} => {}'.format(text, parent.speed), False, color)
@@ -116,6 +118,8 @@ class Text(pg.sprite.Sprite):
             self.value = len(self.parent.game.bgobjects)
         elif self.option == 7:
             self.value = self.parent.game.shields
+        elif self.option == 8:
+            self.value = self.parent.game.booster + 1
         self.image = self.parent.game.font.render('{} => {}'.format(
             self.text, round(self.value, 3)), False, self.color)
 
@@ -237,7 +241,7 @@ class Explosion(pg.sprite.Sprite):
         self.image = self.game.explosion_imgs[int(lifetime / 16) - 1]
 
 
-class Helper_Timeout(pg.sprite.Sprite):
+class Helper(pg.sprite.Sprite):
     def __init__(self, game, parent, rot_offset):
         self.groups = game.all_sprites, game.main
         pg.sprite.Sprite.__init__(self, self.groups)
@@ -259,7 +263,7 @@ class Helper_Timeout(pg.sprite.Sprite):
         if pg.time.get_ticks() - self.spawn_time > HELPER_LIFETIME:
             n = 0
             for sprite in self.game.main:
-                if isinstance(sprite, Helper_Timeout) and sprite is not self:
+                if isinstance(sprite, Helper) and sprite is not self:
                     n += 1
                     sprite.rot_offset = 360 / (len(self.game.main) - 2) * n
                     Explosion(self.game, self.pos)
@@ -279,7 +283,7 @@ class Helper_Timeout(pg.sprite.Sprite):
 
     def shoot(self):
         now = pg.time.get_ticks()
-        if now - self.last_shot > HELPER_FIRE_RATE:
+        if now - self.last_shot > HELPER_FIRE_RATE / (self.game.booster + 1):
             Bullet(self.game, self.pos + BARREL_OFFSET.rotate(self.rot),
                    self.rot)
             self.last_shot = now
@@ -304,6 +308,21 @@ class Bomb(pg.sprite.Sprite):
             Explosion(self.game, hit.pos)
             self.game.chance_for_item(hit.pos, hit.vel)
             hit.kill()
+            self.kill()
+
+
+class Rate_Booster(pg.sprite.Sprite):
+    def __init__(self, game):
+        self.groups = game.all_sprites
+        pg.sprite.Sprite.__init__(self, self.groups)
+        game.booster += 1
+
+        self.game = game
+        self.spawn_time = pg.time.get_ticks()
+
+    def update(self):
+        if pg.time.get_ticks() - self.spawn_time > BOOSTER_LIFETIME:
+            self.game.booster -= 1
             self.kill()
 
 
@@ -334,10 +353,16 @@ class Item(pg.sprite.Sprite):
             rot_offset = 360 - (360 / len(self.game.main))
             n = 0
             for sprite in self.game.main:
-                if isinstance(sprite, Helper_Timeout):
+                if isinstance(sprite, Helper):
                     n += 1
                     sprite.rot_offset = 360 / len(self.game.main) * n
 
-            Helper_Timeout(self.game, self.game.player, rot_offset)
+            Helper(self.game, self.game.player, rot_offset)
         elif self.type == 'shield':
             self.game.shields += 1
+        elif self.type == 'tornado':
+            for invader in self.game.invaders:
+                Explosion(self.game, invader.pos)
+                invader.kill()
+        elif self.type == 'rate_booster':
+            Rate_Booster(self.game)

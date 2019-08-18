@@ -101,13 +101,35 @@ BOMB_MAX_ROT_SPEED = 15
 BOMB_OFFSET = vec(150, 0)
 BOMB_IMG = 'bomb001.png'
 
+# Rate Booster's settings
+BOOSTER_LIFETIME = 15000
+
 # Items properities
-ITEMS_CHANCE = ['bomb', 'bomb', 'bomb', 'bomb', 'helper', 'helper', 'shield']
-# ITEMS_CHANCE = ['shield']
+ITEMS = {
+    'bomb': 12,
+    'helper': 6,
+    'shield': 3,
+    'tornado': 1,
+    'rate_booster': 6
+}
+# ITEMS = {
+#     'bomb': 1,
+#     'helper': 1,
+#     'shield': 1,
+#     'tornado': 1,
+#     'rate_booster': 10
+# }
+ITEMS_CHANCE = []
+for item in ITEMS:
+    for chance in range(0, ITEMS[item]):
+        ITEMS_CHANCE.append(item)
 ITEM_CHANCE = 0.3
 ITEM_IMGS = {'bomb': 'bomb_item002.png',
              'helper': 'helper_item002.png',
-             'shield': 'shield_item001.png'
+             'shield': 'shield_item001.png',
+             'tornado': 'tornado_item001.png',
+             'rate_booster': 'rate_booster_item001.png'
              }
-# ITEM_IMGS = {
-#     'shield': 'shield_item001.png'}
+# print(ITEMS)
+# print(ITEMS_CHANCE)
+# print(ITEM_IMGS)

@@ -38,14 +38,16 @@ class Game:
         self.increase = 0
         self.step = 1
         self.step_checked = 0
-        self.shields = 0
+        self.shields = 1
+        self.booster = 0
         self.player = Player(self)
-        # self.h1 = Helper_Timeout(self, self.player, 180)
+        # self.h1 = Helper(self, self.player, 180)
         # self.b1 = Bomb(self, BOMB_OFFSET.rotate(30) + CENTER)
         self.earth = Earth(self)
 
         self.score_text = Text(vec(30, HEIGHT - 30), YELLOW, self.player, 'Score', 3)
         self.shields_text = Text(vec(30, 30), BLUE, self.player, 'Shields', 7)
+        self.booster_text = Text(vec(30, 60), RED, self.player, 'Boosters', 8)
 
         # self.invaders_text = Text(
         #     vec(30, 30), RED, self.player, 'Invaders', 5)
@@ -135,8 +137,9 @@ class Game:
                     self.playing = False
 
         for object in self.all_sprites:
-            if not SCREEN_WITH_OFFSET.colliderect(object.rect):
-                object.kill()
+            if not isinstance(object, Rate_Booster):
+                if not SCREEN_WITH_OFFSET.colliderect(object.rect):
+                    object.kill()
 
     def events(self):
         # Game Loop - events
