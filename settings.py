@@ -4,7 +4,6 @@ import pygame as pg
 import ctypes
 vec = pg.math.Vector2
 
-
 # game options/settings
 ctypes.windll.user32.SetProcessDPIAware()
 true_res = (ctypes.windll.user32.GetSystemMetrics(0), ctypes.windll.user32.GetSystemMetrics(1))

@@ -3,7 +3,6 @@
 # Main file with class Game
 
 import pygame as pg
-import random
 from settings import *
 from sprites import *
 from os import path
@@ -51,7 +50,8 @@ class Game:
         self.earth = Earth(self)
 
         # setup texts
-        self.score_text = Text(vec(30, HEIGHT - 30), YELLOW, self.player, 'Score', 3)
+        self.score_text = Text(vec(30, HEIGHT - 30),
+                               YELLOW, self.player, 'Score', 3)
         self.shields_text = Text(vec(30, 30), BLUE, self.player, 'Shields', 7)
         self.booster_text = Text(vec(30, 60), RED, self.player, 'Boosters', 8)
         self.fps_text = Text(vec(30, 90), GREEN, self.player, 'FPS', 9)
@@ -62,13 +62,14 @@ class Game:
     def load_data(self):
         # Load game data
         home_dir = path.expanduser('~')
-        self.data_folder = path.join(home_dir, path.join('etmoco', 'circleinvaders'))
-        if not path.exists(data_folder):
-            makedirs(data_folder)
-        with open(path.join(data_folder, HS_FILE), 'w') as f:
+        # self.data_folder = path.join(home_dir, path.join('etmoco', 'circleinvaders'))
+        self.data_folder = path.join(path.dirname(__file__), "data")
+        if not path.exists(self.data_folder):
+            makedirs(self.data_folder)
+        with open(path.join(self.data_folder, HS_FILE), 'w') as f:
             try:
                 self.highscore = int(f.read())
-            except:
+            except ValueError as e:
                 self.highscore = 0
                 f.write(str(self.highscore))
 
@@ -94,37 +95,50 @@ class Game:
 
         sur = pg.image.load(path.join(img_folder, PLAYER_IMG)).convert_alpha()
         surwidth = int(WIDTH / 8)
-        surheight = int(surwidth / (sur.get_rect().width / sur.get_rect().height))
-        self.player_img = pg.transform.rotate(pg.transform.scale(sur, (surwidth, surheight)), 90)
+        surheight = int(
+            surwidth / (sur.get_rect().width / sur.get_rect().height))
+        self.player_img = pg.transform.rotate(
+            pg.transform.scale(sur, (surwidth, surheight)), 90)
 
         sur = pg.image.load(path.join(img_folder, EARTH_IMG)).convert_alpha()
         surwidth = int(WIDTH / 4)
-        surheight = int(surwidth / (sur.get_rect().width / sur.get_rect().height))
-        self.earth_img = pg.transform.scale(pg.image.load(path.join(img_folder, EARTH_IMG)), (surwidth, surheight))
+        surheight = int(
+            surwidth / (sur.get_rect().width / sur.get_rect().height))
+        self.earth_img = pg.transform.scale(pg.image.load(
+            path.join(img_folder, EARTH_IMG)), (surwidth, surheight))
 
         sur = pg.image.load(path.join(img_folder, BULLET_IMG)).convert_alpha()
         surwidth = int(WIDTH / 100)
-        surheight = int(surwidth / (sur.get_rect().width / sur.get_rect().height))
-        self.bullet_img = pg.transform.rotate(pg.transform.scale(sur, (surwidth, surheight)), 270)
+        surheight = int(
+            surwidth / (sur.get_rect().width / sur.get_rect().height))
+        self.bullet_img = pg.transform.rotate(
+            pg.transform.scale(sur, (surwidth, surheight)), 270)
 
         sur = pg.image.load(path.join(img_folder, HELPER_IMG)).convert_alpha()
         surwidth = int(WIDTH / 10)
-        surheight = int(surwidth / (sur.get_rect().width / sur.get_rect().height))
-        self.helper_img = pg.transform.rotate(pg.transform.scale(sur, (surwidth, surheight)), 90)
+        surheight = int(
+            surwidth / (sur.get_rect().width / sur.get_rect().height))
+        self.helper_img = pg.transform.rotate(
+            pg.transform.scale(sur, (surwidth, surheight)), 90)
 
         sur = pg.image.load(path.join(img_folder, BOMB_IMG)).convert_alpha()
         surwidth = int(WIDTH / 20)
-        surheight = int(surwidth / (sur.get_rect().width / sur.get_rect().height))
+        surheight = int(
+            surwidth / (sur.get_rect().width / sur.get_rect().height))
         self.bomb_img = pg.transform.scale(sur, (surwidth, surheight))
 
         for img_path in BGOBJECT_IMGS:
-            self.bgobject_imgs.append(pg.image.load(path.join(img_folder, img_path)).convert_alpha())
+            self.bgobject_imgs.append(pg.image.load(
+                path.join(img_folder, img_path)).convert_alpha())
 
         for img_path in INVADER_IMGS:
-            sur = pg.image.load(path.join(img_folder, img_path)).convert_alpha()
+            sur = pg.image.load(
+                path.join(img_folder, img_path)).convert_alpha()
             surwidth = int(WIDTH / 16)
-            surheight = int(surwidth / (sur.get_rect().width / sur.get_rect().height))
-            self.invader_imgs.append(pg.transform.scale(sur, (surwidth, surheight)))
+            surheight = int(
+                surwidth / (sur.get_rect().width / sur.get_rect().height))
+            self.invader_imgs.append(
+                pg.transform.scale(sur, (surwidth, surheight)))
 
         for img_path in EXPLOSION_IMGS:
             sur = pg.image.load(path.join(explosion_folder, img_path))
@@ -132,10 +146,13 @@ class Game:
             self.explosion_imgs.append(sur)
 
         for img_path in ITEM_IMGS:
-            sur = pg.image.load(path.join(item_folder, ITEM_IMGS[img_path])).convert_alpha()
+            sur = pg.image.load(
+                path.join(item_folder, ITEM_IMGS[img_path])).convert_alpha()
             surwidth = min(int(WIDTH / 21), 24)
-            surheight = int(surwidth / (sur.get_rect().width / sur.get_rect().height))
-            self.item_imgs[img_path] = pg.transform.scale(sur, (surwidth, surheight))
+            surheight = int(
+                surwidth / (sur.get_rect().width / sur.get_rect().height))
+            self.item_imgs[img_path] = pg.transform.scale(
+                sur, (surwidth, surheight))
 
     def run(self):
         # Game Loop
@@ -151,7 +168,8 @@ class Game:
         self.chance_for_bgobject()
         self.chance_for_enemy()
         self.all_sprites.update()
-        hits = pg.sprite.groupcollide(self.invaders, self.bullets, False, False)
+        hits = pg.sprite.groupcollide(
+            self.invaders, self.bullets, False, False)
         for hit in hits:
             if isinstance(hit, Invader):
                 Explosion(self, hit.pos)
@@ -178,7 +196,7 @@ class Game:
                 else:
                     self.playing = False
                     with open(path.join(self.data_folder, HS_FILE), 'w') as f:
-                        
+                        pass
 
         for object in self.all_sprites:
             if not isinstance(object, Rate_Booster):
@@ -193,6 +211,9 @@ class Game:
                 if self.playing:
                     self.playing = False
                 self.running = False
+                with open(path.join(self.data_folder, "highscore.txt"), 'w') as file:
+                    file.truncate(0)
+                    file.write(str(self.player.score))
 
         # check for escape button
         for idx, key in enumerate(pg.key.get_pressed()):
@@ -200,6 +221,9 @@ class Game:
                 if self.playing:
                     self.playing = False
                 self.running = False
+                with open(path.join(self.data_folder, "highscore.txt"), 'w') as file:
+                    file.truncate(0)
+                    file.write(str(self.player.score))
 
     def draw(self):
         # Game Loop - draw
@@ -247,7 +271,9 @@ class Game:
 
     def show_go_screen(self):
         # game over/continue
-        pass
+        with open(path.join(self.data_folder, "highscore.txt"), 'w') as file:
+            file.truncate(0)
+            file.write(str(self.player.score))
 
     def chance_for_enemy(self):
         chance = round(uniform(

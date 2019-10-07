@@ -66,6 +66,7 @@ class Player(pg.sprite.Sprite):
         self.rot += self.speed
 
         self.image = pg.transform.rotate(self.game.player_img, -self.rot + 180)
+        self.mask = pg.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
         self.pos = CENTER_OFFSET.rotate(self.rot) + CENTER
         self.rect.center = self.pos
